@@ -1,5 +1,23 @@
-// Aquí irá la lógica principal de autenticación y paneles por rol
-// Se conectará a Supabase y mostrará la interfaz correspondiente
+import { useEffect, useState } from 'react';
+import { supabase } from './supabaseClient';
+import Dashboard from './Dashboard';
+import Login from './Login';
+
 export default function App() {
-  return <h1>Proyecto base listo para conectar con Supabase</h1>;
+  const [session, setSession] = useState(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+    supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+  }, []);
+
+  return session ? (
+    <Dashboard session={session} />
+  ) : (
+    <Login />
+  );
 }
